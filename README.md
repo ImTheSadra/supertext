@@ -6,4 +6,4 @@
 
 - ```python[version] -m [m value -> float]```
 
-![screenshot]("./screenshot.png")
+![screenshot](screenshot.png)
