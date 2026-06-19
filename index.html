@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Supershape · Liquid Explosion</title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+    <div class="flex flex-col md:flex-row h-screen w-screen bg-slate-900 text-slate-200">
+
+        <div class="flex-1 md:w-1/2 bg-slate-800 p-2 md:p-3 flex items-center justify-center">
+            <div class="canvas-wrapper">
+                <div id="three-container"></div>
+            </div>
+        </div>
+
+        <div class="md:w-1/2 bg-slate-900 p-2 md:p-3 flex flex-col border-t md:border-t-0 md:border-l border-slate-700">
+            <div class="flex items-center justify-between mb-1 md:mb-2">
+                <h2 class="text-xs font-semibold tracking-wider text-slate-400 uppercase glow-text">✦ 3D Supershape</h2>
+                <div class="flex items-center gap-2">
+                    <span class="fps-badge" id="fpsDisplay">FPS: 60</span>
+                    <button id="pauseBtn" class="pause-btn">⏸ Pause</button>
+                </div>
+            </div>
+
+            <div class="scrollable-controls flex flex-col gap-2">
+
+                <div class="control-group">
+                    <div class="grid grid-cols-2 gap-x-3 gap-y-0.5">
+                        <div class="param-row">
+                            <span class="control-label">m</span>
+                            <input type="range" id="paramM" min="0.5" max="20" step="0.1" value="4" />
+                            <span id="valM" class="size-badge">4.0</span>
+                        </div>
+                        <div class="param-row">
+                            <span class="control-label">n₁</span>
+                            <input type="range" id="paramN1" min="0.1" max="10" step="0.1" value="1" />
+                            <span id="valN1" class="size-badge">1.0</span>
+                        </div>
+                        <div class="param-row">
+                            <span class="control-label">n₂</span>
+                            <input type="range" id="paramN2" min="0.1" max="10" step="0.1" value="1" />
+                            <span id="valN2" class="size-badge">1.0</span>
+                        </div>
+                        <div class="param-row">
+                            <span class="control-label">n₃</span>
+                            <input type="range" id="paramN3" min="0.1" max="10" step="0.1" value="1" />
+                            <span id="valN3" class="size-badge">1.0</span>
+                        </div>
+                        <div class="param-row">
+                            <span class="control-label">a</span>
+                            <input type="range" id="paramA" min="0.1" max="5" step="0.1" value="1" />
+                            <span id="valA" class="size-badge">1.0</span>
+                        </div>
+                        <div class="param-row">
+                            <span class="control-label">b</span>
+                            <input type="range" id="paramB" min="0.1" max="5" step="0.1" value="1" />
+                            <span id="valB" class="size-badge">1.0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span class="control-label">Scale</span>
+                        <input type="range" id="scaleSlider" min="10" max="200" value="80" class="flex-1 min-w-[50px]" />
+                        <span id="scaleDisplay" class="size-badge text-xs">80%</span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3 mt-1">
+                        <span class="control-label">Height</span>
+                        <input type="range" id="heightSlider" min="10" max="200" value="100" class="flex-1 min-w-[50px]" />
+                        <span id="heightDisplay" class="size-badge text-xs">100%</span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3 mt-1">
+                        <span class="control-label">Speed</span>
+                        <input type="range" id="speedSlider" min="1" max="100" value="30" class="flex-1 min-w-[50px]" />
+                        <span id="speedDisplay" class="size-badge text-xs">30%</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="control-label">Mode</span>
+                        <button data-mode="morph" class="mode-btn active">Morph</button>
+                        <button data-mode="liquid" class="mode-btn">Liquid</button>
+                        <button data-mode="explosion" class="mode-btn">Explosion</button>
+                        <button data-mode="pulse" class="mode-btn">Pulse</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span class="control-label">Colors</span>
+                        <div class="color-pair">
+                            <input type="color" id="color1" value="#3b82f6" />
+                            <span class="text-xs text-slate-600">→</span>
+                            <input type="color" id="color2" value="#f472b6" />
+                        </div>
+                        <div class="flex gap-1 ml-auto">
+                            <button data-mix="angle" class="mix-btn active">Angle</button>
+                            <button data-mix="radial" class="mix-btn">Radial</button>
+                            <button data-mix="hsl" class="mix-btn">HSL</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button id="saveBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1.5 px-3 rounded-lg text-xs transition-all duration-200 flex items-center justify-center gap-2 border border-blue-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            Save PNG
+                        </button>
+                        <button id="resetViewBtn" class="btn-icon" title="Reset View">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+                        </button>
+                        <button id="randomBtn" class="btn-icon" title="Randomize">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.5 9.5A9 9 0 0 0 4.5 14.5"/><polyline points="1 20 1 14 7 14"/><path d="M3.5 14.5A9 9 0 0 0 19.5 9.5"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-[10px] text-slate-500 text-center mt-0.5 flex justify-between">
+                    <span>✦ drag to rotate · scroll to zoom</span>
+                    <span id="shapeInfo">θ: 0.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        const container = document.getElementById('three-container');
+        const sliders = {
+            m: document.getElementById('paramM'),
+            n1: document.getElementById('paramN1'),
+            n2: document.getElementById('paramN2'),
+            n3: document.getElementById('paramN3'),
+            a: document.getElementById('paramA'),
+            b: document.getElementById('paramB'),
+            scale: document.getElementById('scaleSlider'),
+            height: document.getElementById('heightSlider'),
+            speed: document.getElementById('speedSlider')
+        };
+        const displays = {
+            m: document.getElementById('valM'),
+            n1: document.getElementById('valN1'),
+            n2: document.getElementById('valN2'),
+            n3: document.getElementById('valN3'),
+            a: document.getElementById('valA'),
+            b: document.getElementById('valB'),
+            scale: document.getElementById('scaleDisplay'),
+            height: document.getElementById('heightDisplay'),
+            speed: document.getElementById('speedDisplay')
+        };
+        const color1Input = document.getElementById('color1');
+        const color2Input = document.getElementById('color2');
+        const fpsDisplay = document.getElementById('fpsDisplay');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const shapeInfo = document.getElementById('shapeInfo');
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0f1a);
+
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+        camera.position.set(4, 3, 6);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = false;
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.08;
+        controls.autoRotate = false;
+        controls.target.set(0, 0, 0);
+        controls.update();
+
+        const ambientLight = new THREE.AmbientLight(0x404060, 0.5);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.8);
+        dirLight.position.set(1, 2, 1);
+        scene.add(dirLight);
+
+        const backLight = new THREE.DirectionalLight(0x446688, 0.6);
+        backLight.position.set(-1, -0.5, -1);
+        scene.add(backLight);
+
+        const fillLight = new THREE.DirectionalLight(0x88aaff, 0.4);
+        fillLight.position.set(-0.5, 0.5, 1);
+        scene.add(fillLight);
+
+        function supershape(theta, m, n1, n2, n3, a, b) {
+            const cosPart = Math.pow(Math.abs((1 / a) * Math.cos(theta * m / 4)), n1);
+            const sinPart = Math.pow(Math.abs((1 / b) * Math.sin(theta * m / 4)), n2);
+            const r = Math.pow(cosPart + sinPart, -1 / n3);
+            return r || 0;
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? { r: parseInt(result[1], 16) / 255, g: parseInt(result[2], 16) / 255, b: parseInt(result[3],
+                    16) / 255 } : { r: 0.2, g: 0.5, b: 0.9 };
+        }
+
+        function lerpColor(c1, c2, t) {
+            t = Math.max(0, Math.min(1, t));
+            return { r: c1.r + (c2.r - c1.r) * t, g: c1.g + (c2.g - c1.g) * t, b: c1.b + (c2.b - c1.b) * t };
+        }
+
+        function hslToRgb(h, s, l) {
+            h = ((h % 360) + 360) % 360;
+            const c = (1 - Math.abs(2 * l - 1)) * s;
+            const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+            const m = l - c / 2;
+            let r, g, b;
+            if (h < 60) { r = c;
+                g = x;
+                b = 0; } else if (h < 120) { r = x;
+                g = c;
+                b = 0; } else if (h < 180) { r = 0;
+                g = c;
+                b = x; } else if (h < 240) { r = 0;
+                g = x;
+                b = c; } else if (h < 300) { r = x;
+                g = 0;
+                b = c; } else { r = c;
+                g = 0;
+                b = x; }
+            return { r: (r + m), g: (g + m), b: (b + m) };
+        }
+
+        function getColorForAngle(theta, phi, mode, c1, c2, tOffset) {
+            const a1 = hexToRgb(c1);
+            const a2 = hexToRgb(c2);
+            let t;
+            if (mode === 'angle') {
+                t = ((theta / (2 * Math.PI)) % 1 + 1) % 1;
+            } else if (mode === 'radial') {
+                const dist = Math.abs(Math.sin(theta * 2 + tOffset * 2)) * 0.8 + 0.2;
+                t = dist;
+            } else if (mode === 'hsl') {
+                const hue = (theta * 180 / Math.PI + tOffset * 60) % 360;
+                const sat = 0.7 + 0.3 * Math.sin(theta * 2 + tOffset);
+                const lig = 0.5 + 0.3 * Math.cos(theta * 1.5 + tOffset * 0.5);
+                const col = hslToRgb(hue, sat, lig);
+                return { r: col.r, g: col.g, b: col.b };
+            } else {
+                t = ((theta / (2 * Math.PI)) % 1 + 1) % 1;
+            }
+            const col = lerpColor(a1, a2, t);
+            return { r: col.r, g: col.g, b: col.b };
+        }
+
+        const params = {
+            m: 4,
+            n1: 1,
+            n2: 1,
+            n3: 1,
+            a: 1,
+            b: 1,
+            scale: 0.8,
+            height: 1.0,
+            speed: 0.3,
+            color1: '#3b82f6',
+            color2: '#f472b6',
+            mixMode: 'angle',
+            animationMode: 'morph'
+        };
+
+        let animTime = 0;
+        let isPaused = false;
+        let fpsFrames = 0;
+        let fpsTime = 0;
+        let currentFps = 60;
+
+        const numTheta = 80;
+        const numPhi = 64;
+        let mesh = null;
+
+        function buildGeometry(time) {
+            const mBase = parseFloat(sliders.m.value);
+            const n1Base = parseFloat(sliders.n1.value);
+            const n2Base = parseFloat(sliders.n2.value);
+            const n3Base = parseFloat(sliders.n3.value);
+            const aBase = parseFloat(sliders.a.value);
+            const bBase = parseFloat(sliders.b.value);
+
+            const speed = params.speed * 0.02;
+            const wave1 = Math.sin(time * 0.3) * 0.8;
+            const wave2 = Math.cos(time * 0.2) * 0.6;
+            const wave3 = Math.sin(time * 0.25 + 1) * 0.5;
+
+            let m = Math.max(0.5, mBase + wave1 * 0.6);
+            let n1 = Math.max(0.1, n1Base + wave2 * 0.4);
+            let n2 = Math.max(0.1, n2Base + wave3 * 0.4);
+            let n3 = Math.max(0.1, n3Base + Math.sin(time * 0.15) * 0.3);
+            let a = Math.max(0.1, aBase + Math.sin(time * 0.1) * 0.1);
+            let b = Math.max(0.1, bBase + Math.cos(time * 0.12) * 0.1);
+
+            const baseScale = parseFloat(sliders.scale.value) / 100;
+            const heightScale = parseFloat(sliders.height.value) / 100;
+
+            let modeScale = 1;
+            let extraDeform = (x, y, z, theta, phi) => ({ x, y, z });
+
+            switch (params.animationMode) {
+                case 'morph':
+                    break;
+                case 'liquid':
+                    const liquidAmp = 0.15 + 0.1 * Math.sin(time * 0.5);
+                    extraDeform = (x, y, z, theta, phi) => {
+                        const wave = Math.sin(theta * 5 + time * 1.5) * Math.cos(phi * 3 + time * 1.2) * liquidAmp;
+                        const scaleFactor = 1 + wave;
+                        return { x: x * scaleFactor, y: y * (1 + 0.1 * Math.sin(theta * 4 + time * 1.8)), z: z *
+                                scaleFactor };
+                    };
+                    break;
+                case 'explosion':
+                    const pulse = 0.5 + 0.5 * Math.sin(time * 0.8);
+                    const explosionAmp = 0.8 + 0.6 * Math.sin(time * 1.2);
+                    extraDeform = (x, y, z, theta, phi) => {
+                        const r = Math.sqrt(x * x + y * y + z * z) || 0.001;
+                        const scale = 1 + explosionAmp * 0.5 * (0.5 + 0.5 * Math.sin(theta * 3 + time * 2));
+                        const noise = Math.sin(theta * 7 + time * 3) * Math.cos(phi * 5 + time * 2.5);
+                        const factor = 1 + 0.4 * noise * pulse;
+                        return { x: x * factor * scale, y: y * factor * scale, z: z * factor * scale };
+                    };
+                    break;
+                case 'pulse':
+                    const pulseScale = 0.7 + 0.3 * Math.sin(time * 1.2);
+                    extraDeform = (x, y, z, theta, phi) => {
+                        const s = pulseScale;
+                        return { x: x * s, y: y * s, z: z * s };
+                    };
+                    break;
+                default:
+                    break;
+            }
+
+            const positions = [];
+            const colors = [];
+            const indices = [];
+
+            const colorOffset = time * 0.02;
+
+            for (let i = 0; i <= numTheta; i++) {
+                const theta = (i / numTheta) * 2 * Math.PI;
+                const r = supershape(theta, m, n1, n2, n3, a, b);
+                const yBase = (theta / (2 * Math.PI) - 0.5) * 2 * heightScale * 1.2;
+
+                for (let j = 0; j <= numPhi; j++) {
+                    const phi = (j / numPhi) * 2 * Math.PI;
+                    let x = r * Math.cos(phi) * baseScale;
+                    let y = yBase;
+                    let z = r * Math.sin(phi) * baseScale;
+
+                    const deformed = extraDeform(x, y, z, theta, phi);
+                    x = deformed.x;
+                    y = deformed.y;
+                    z = deformed.z;
+
+                    positions.push(x, y, z);
+
+                    const col = getColorForAngle(theta, phi, params.mixMode, params.color1, params.color2, colorOffset);
+                    colors.push(col.r, col.g, col.b);
+                }
+            }
+
+            for (let i = 0; i < numTheta; i++) {
+                for (let j = 0; j < numPhi; j++) {
+                    const a0 = i * (numPhi + 1) + j;
+                    const a1 = i * (numPhi + 1) + j + 1;
+                    const b0 = (i + 1) * (numPhi + 1) + j;
+                    const b1 = (i + 1) * (numPhi + 1) + j + 1;
+                    indices.push(a0, a1, b1);
+                    indices.push(a0, b1, b0);
+                }
+            }
+
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            geo.setIndex(indices);
+            geo.computeVertexNormals();
+
+            return geo;
+        }
+
+        function updateMesh(time) {
+            const newGeo = buildGeometry(time);
+            if (mesh) {
+                mesh.geometry.dispose();
+                mesh.geometry = newGeo;
+            } else {
+                const mat = new THREE.MeshPhongMaterial({
+                    vertexColors: true,
+                    side: THREE.DoubleSide,
+                    shininess: 40,
+                    specular: new THREE.Color(0x222244),
+                    flatShading: false,
+                    transparent: true,
+                    opacity: 0.98
+                });
+                mesh = new THREE.Mesh(newGeo, mat);
+                scene.add(mesh);
+            }
+        }
+
+        function animate(timestamp) {
+            if (!isPaused) {
+                const dt = timestamp - (animTime || timestamp);
+                animTime = timestamp;
+
+                fpsFrames++;
+                if (timestamp - fpsTime > 1000) {
+                    currentFps = fpsFrames;
+                    fpsFrames = 0;
+                    fpsTime = timestamp;
+                    fpsDisplay.textContent = `FPS: ${currentFps}`;
+                }
+
+                const time = timestamp / 1000;
+                updateMesh(time);
+                controls.update();
+
+                shapeInfo.textContent = `mode: ${params.animationMode}  θ: ${(time % 6.28).toFixed(2)}`;
+            }
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+
+        function onResize() {
+            const w = container.clientWidth;
+            const h = container.clientHeight;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+        }
+        window.addEventListener('resize', onResize);
+
+        function updateDisplays() {
+            for (const key of ['m', 'n1', 'n2', 'n3', 'a', 'b']) {
+                const slider = document.getElementById(`param${key.toUpperCase()}`);
+                const display = document.getElementById(`val${key.toUpperCase()}`);
+                if (slider && display) {
+                    display.textContent = parseFloat(slider.value).toFixed(1);
+                }
+            }
+            displays.scale.textContent = Math.round(parseFloat(sliders.scale.value)) + '%';
+            displays.height.textContent = Math.round(parseFloat(sliders.height.value)) + '%';
+            displays.speed.textContent = Math.round(parseFloat(sliders.speed.value)) + '%';
+        }
+        Object.values(sliders).forEach(slider => {
+            slider.addEventListener('input', () => {
+                updateDisplays();
+                params.scale = parseFloat(sliders.scale.value) / 100;
+                params.height = parseFloat(sliders.height.value) / 100;
+                params.speed = parseFloat(sliders.speed.value) / 100;
+            });
+        });
+
+        color1Input.addEventListener('input', function() { params.color1 = this.value; });
+        color2Input.addEventListener('input', function() { params.color2 = this.value; });
+
+        document.querySelectorAll('.mix-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.mix-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                params.mixMode = this.dataset.mix;
+            });
+        });
+
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                params.animationMode = this.dataset.mode;
+            });
+        });
+
+        document.getElementById('saveBtn').addEventListener('click', function() {
+            renderer.render(scene, camera);
+            const link = document.createElement('a');
+            link.download = 'supershape-3d.png';
+            link.href = renderer.domElement.toDataURL('image/png');
+            link.click();
+        });
+
+        document.getElementById('resetViewBtn').addEventListener('click', function() {
+            camera.position.set(4, 3, 6);
+            controls.target.set(0, 0, 0);
+            controls.update();
+        });
+
+        document.getElementById('randomBtn').addEventListener('click', function() {
+            const random = (min, max, step = 0.1) => Math.round((Math.random() * (max - min) + min) / step) * step;
+            sliders.m.value = random(0.5, 20);
+            sliders.n1.value = random(0.1, 10);
+            sliders.n2.value = random(0.1, 10);
+            sliders.n3.value = random(0.1, 10);
+            sliders.a.value = random(0.1, 5);
+            sliders.b.value = random(0.1, 5);
+            sliders.scale.value = Math.round(random(20, 180, 1));
+            sliders.height.value = Math.round(random(20, 200, 1));
+            sliders.speed.value = Math.round(random(5, 80, 1));
+            updateDisplays();
+            const randColor = () => '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+            color1Input.value = randColor();
+            color2Input.value = randColor();
+            params.color1 = color1Input.value;
+            params.color2 = color2Input.value;
+            const modes = ['angle', 'radial', 'hsl'];
+            const mode = modes[Math.floor(Math.random() * modes.length)];
+            document.querySelectorAll('.mix-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.mix === mode);
+            });
+            params.mixMode = mode;
+            const animModes = ['morph', 'liquid', 'explosion', 'pulse'];
+            const animMode = animModes[Math.floor(Math.random() * animModes.length)];
+            document.querySelectorAll('.mode-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.mode === animMode);
+            });
+            params.animationMode = animMode;
+            params.scale = parseFloat(sliders.scale.value) / 100;
+            params.height = parseFloat(sliders.height.value) / 100;
+            params.speed = parseFloat(sliders.speed.value) / 100;
+        });
+
+        pauseBtn.addEventListener('click', function() {
+            isPaused = !isPaused;
+            this.textContent = isPaused ? '▶ Play' : '⏸ Pause';
+            this.classList.toggle('active', isPaused);
+            if (!isPaused) {
+                animTime = null;
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === ' ' || e.key === 'Space') {
+                e.preventDefault();
+                pauseBtn.click();
+            }
+            if (e.key === 'r' || e.key === 'R') {
+                document.getElementById('randomBtn').click();
+            }
+            if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                document.getElementById('saveBtn').click();
+            }
+        });
+
+        updateDisplays();
+        animate(0);
+        console.log('🚀 3D Supershape with Liquid Explosion modes!');
+
+        const resizeObserver = new ResizeObserver(() => onResize());
+        resizeObserver.observe(container);
+    </script>
+
+</body>
+</html>

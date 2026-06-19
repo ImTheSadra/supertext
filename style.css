@@ -1,0 +1,292 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    overflow: hidden;
+    font-family: system-ui, -apple-system, sans-serif;
+    height: 100vh;
+    width: 100vw;
+    background: #0a0f1a;
+}
+#three-container {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 12px;
+    background: #0a0f1a;
+}
+.canvas-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 320px;
+    background: #0a0f1a;
+    border-radius: 12px;
+    padding: 6px;
+    overflow: hidden;
+}
+.control-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748b;
+    min-width: 20px;
+}
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 3px;
+    border-radius: 2px;
+    background: #334155;
+    outline: none;
+    transition: background 0.2s;
+    flex: 1;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    border: 2px solid #1e293b;
+    transition: transform 0.15s;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+}
+input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    border: 2px solid #1e293b;
+}
+.btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 2px solid #334155;
+    background: #1e293b;
+    color: #e2e8f0;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.btn-icon:hover {
+    background: #2d3748;
+    border-color: #3b82f6;
+    transform: translateY(-1px);
+}
+.btn-icon.active {
+    border-color: #3b82f6;
+    background: #1e3a5f;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+.btn-icon.danger:hover {
+    border-color: #ef4444;
+    background: #3b1e1e;
+}
+.size-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 26px;
+    background: #1e293b;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.65rem;
+    color: #e2e8f0;
+    padding: 0 6px;
+    border: 1px solid #334155;
+    flex-shrink: 0;
+}
+.control-group {
+    background: #0f172a;
+    border-radius: 10px;
+    padding: 10px 12px;
+    border: 1px solid #1e293b;
+}
+.param-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 3px;
+}
+.param-row:last-child {
+    margin-bottom: 0;
+}
+.param-row .control-label {
+    min-width: 16px;
+    width: 16px;
+    text-align: right;
+    font-size: 0.6rem;
+}
+.param-row input[type="range"] {
+    min-width: 40px;
+}
+.param-row .size-badge {
+    min-width: 28px;
+    font-size: 0.6rem;
+}
+.scrollable-controls {
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 2px;
+}
+.scrollable-controls::-webkit-scrollbar {
+    width: 3px;
+}
+.scrollable-controls::-webkit-scrollbar-track {
+    background: #0f172a;
+    border-radius: 4px;
+}
+.scrollable-controls::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+.mode-btn {
+    padding: 3px 10px;
+    border-radius: 5px;
+    border: 1px solid #334155;
+    background: #1e293b;
+    color: #94a3b8;
+    font-size: 0.6rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.mode-btn.active {
+    border-color: #3b82f6;
+    background: #1e3a5f;
+    color: #e2e8f0;
+}
+.mode-btn:hover {
+    border-color: #3b82f6;
+}
+.color-pair {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.color-pair input[type="color"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 30px;
+    height: 30px;
+    border: 2px solid #334155;
+    border-radius: 8px;
+    cursor: pointer;
+    background: transparent;
+    padding: 2px;
+    flex-shrink: 0;
+}
+.color-pair input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+.color-pair input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 5px;
+}
+.color-pair input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 5px;
+}
+@media (max-width: 768px) {
+    .canvas-wrapper {
+        min-height: 240px;
+        padding: 4px;
+    }
+    .control-group {
+        padding: 8px 10px;
+    }
+    .param-row .control-label {
+        min-width: 14px;
+        width: 14px;
+        font-size: 0.55rem;
+    }
+    .param-row .size-badge {
+        min-width: 22px;
+        font-size: 0.55rem;
+        padding: 0 4px;
+    }
+    .mode-btn {
+        padding: 2px 8px;
+        font-size: 0.55rem;
+    }
+    .color-pair input[type="color"] {
+        width: 26px;
+        height: 26px;
+    }
+    .btn-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 0.85rem;
+    }
+}
+@media (max-width: 480px) {
+    .canvas-wrapper {
+        min-height: 180px;
+    }
+    .control-group {
+        padding: 6px 8px;
+    }
+    .param-row {
+        gap: 4px;
+    }
+    .param-row input[type="range"] {
+        min-width: 30px;
+    }
+}
+.glow-text {
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+}
+.fps-badge {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(4px);
+    border: 1px solid #1e293b;
+    border-radius: 6px;
+    padding: 2px 10px;
+    font-size: 0.6rem;
+    color: #64748b;
+    font-family: monospace;
+}
+.pause-btn {
+    padding: 4px 14px;
+    border-radius: 6px;
+    border: 1px solid #334155;
+    background: #1e293b;
+    color: #94a3b8;
+    font-size: 0.65rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.pause-btn.active {
+    border-color: #f59e0b;
+    background: #1e293b;
+    color: #f59e0b;
+}
+.pause-btn:hover {
+    border-color: #f59e0b;
+}
+#three-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 10px;
+}
