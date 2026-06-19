@@ -4,6 +4,6 @@
 
 - or 
 
-- ```python[version] -m [m value -> float]```
+- ```python[version] main.py -m [m value -> float]```
 
 ![screenshot](screenshot.png)
